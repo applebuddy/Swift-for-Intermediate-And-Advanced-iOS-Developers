@@ -7,6 +7,9 @@
 
 import Foundation
 
+// MARK: 44. Replacing Dispatch with MainActor
+// @MainActor를 사용하면 해당 객체는 항상 main thread에서 동작하게 된다.
+@MainActor
 class NewsArticleListViewModel: ObservableObject {
     
     @Published var newsArticles = [NewsArticleViewModel]()
@@ -15,9 +18,7 @@ class NewsArticleListViewModel: ObservableObject {
         
       do {
         let newsArticles = try await Webservice().fetchNewsAsync(sourceId: sourceId, url: Constants.Urls.topHeadlines(by: sourceId))
-        DispatchQueue.main.async { [weak self] in
-          self?.newsArticles = newsArticles.map(NewsArticleViewModel.init)
-        }
+        self.newsArticles = newsArticles.map(NewsArticleViewModel.init)
       } catch let error {
         print(error.localizedDescription)
       }

@@ -7,6 +7,8 @@
 
 import Foundation
 
+// @MainActor를 선언하면 해당 객체 내에서 DispatchQueue.main 큐를 명시해서 메인스레드 동작 코드를 작성할 필요가 없어져요.
+@MainActor
 class NewsSourceListViewModel: ObservableObject {
     
     @Published var newsSources: [NewsSourceViewModel] = []
@@ -14,9 +16,7 @@ class NewsSourceListViewModel: ObservableObject {
     func getSources() async {
       do {
         let newsSources = try await Webservice().fetchSourcesAsync(url: Constants.Urls.sources)
-        DispatchQueue.main.async {
-            self.newsSources = newsSources.map(NewsSourceViewModel.init)
-        }
+        self.newsSources = newsSources.map(NewsSourceViewModel.init)
       } catch let error {
         print(error.localizedDescription)
       }
