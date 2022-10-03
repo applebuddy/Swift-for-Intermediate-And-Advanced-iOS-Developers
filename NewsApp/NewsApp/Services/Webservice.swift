@@ -52,7 +52,25 @@ class Webservice {
   }
    */
   
-  func fetchNews(by sourceId: String, url: URL?, completion: @escaping (Result<[NewsArticle], NetworkError>) -> Void) {
+  // MARK: 43. Using Continuation to Create Custom Async/Await Methods
+  // 건들이기 어려운 third party 메서드를 async await하게 사용하기 위해서 withCheckedContinuation 을 활용할 수 있다.
+  func fetchNewsAsync(sourceId: String, url: URL?) async throws -> [NewsArticle] {
+    // iOS15에서 Apple이 소개한 기능,
+    // 1) 에러 타입이 Never이면 withCheckedContinuation을 사용한다.
+    // 2) throw 할 에러가 존재하는 경우, withCheckedThrowingContinuation을 사용한다.
+    try await withCheckedThrowingContinuation { continuation in
+      fetchNews(by: sourceId, url: url) { result in
+        switch result {
+        case .success(let newsArticles):
+          continuation.resume(returning: newsArticles)
+        case .failure(let error):
+          continuation.resume(throwing: error)
+        }
+      }
+    }
+  }
+  
+  private func fetchNews(by sourceId: String, url: URL?, completion: @escaping (Result<[NewsArticle], NetworkError>) -> Void) {
     
     guard let url = url else {
       completion(.failure(.badUrl))

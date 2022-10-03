@@ -13,18 +13,17 @@ struct NewsListScreen: View {
     @StateObject private var newsArticleListViewModel = NewsArticleListViewModel()
     
     var body: some View {
-        
-        NavigationView {
-        
         List(newsArticleListViewModel.newsArticles, id: \.id) { newsArticle in
                 NewsArticleCell(newsArticle: newsArticle)
         }
         .listStyle(.plain)
-        .onAppear {
-            newsArticleListViewModel.getNewsBy(sourceId: newsSource.id)
-        }
+        .task({ // 앞서 다뤘듯이, task를 사용하면 onAppear 이벤트때 비동기 작업을 수행하는 코드를 작성할 수 있다.
+          await newsArticleListViewModel.getNewsBy(sourceId: newsSource.id)
+        })
+//        .onAppear {
+//            newsArticleListViewModel.getNewsBy(sourceId: newsSource.id)
+//        }
         .navigationTitle(newsSource.name)
-        }
     }
 }
 
