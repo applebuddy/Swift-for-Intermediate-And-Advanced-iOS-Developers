@@ -7,6 +7,8 @@
 
 // MARK: 47. Generics for Protocol
 // Parser는 다양한 Input에 대한 다양한 Output을 가질 수 있도록 만들고 싶습니다. 이때 associatedType을 활용해봅니다.
+// MARK: 48. Example 1 - Protocol Extensions (Parser)
+// protocol의 extension을 활용해봅니다.
 
 import Foundation
 
@@ -18,6 +20,36 @@ protocol Parser {
   
   func parse(input: Input) -> Output
 }
+
+// 프로토콜도 extension을 사용할 수 있습니다.
+extension Parser {
+
+  func parse(input: String) -> [String] {
+    return ["<html></html>", "<p></p>"]
+  }
+}
+
+// XHTML 클래스와 같이 mandatory method 구현을 깜빡하고, parse 구현을 잊었을때 위 처럼 extension이 구현되어있다면 extension의 구현내용이 default로 적용되어 컴파일이 가능합니다.
+class XHTMLParser: Parser {
+  
+}
+
+class OHTMLParser: Parser {
+  // Parser를 채택한 클래스 내부에 필수 메서드를 정의했다면 extension 구현 함수와 함께 사용 가능
+  func parse(input: Int) -> [Int] {
+    return [0]
+  }
+}
+
+func xHTMLParser() {
+  let xhtmlParser = XHTMLParser()
+  xhtmlParser.parse(input: "") // extension default 구현상태인 String -> [String] 타입으로 parse메서드가 사용됨
+  let ohtmlParser = OHTMLParser()
+  // ohtmlParser는 extension, 클래스 내부 정의된 함수 모두 접근 가능
+  ohtmlParser.parse(input: "")
+  ohtmlParser.parse(input: 0)
+}
+
 
 class TextFileParser: Parser {
   // TextFileParser에서는 Input, Output 타입을 String으로 사용합니다.
