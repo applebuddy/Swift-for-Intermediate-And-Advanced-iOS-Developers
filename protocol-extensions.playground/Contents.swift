@@ -1,4 +1,7 @@
 // MARK: 49. Example 2 - Protocol Extensions (BankAccount)
+// - protocol extension의 구현부가 있으면 protocol을 채택한 곳에서 메서드를 구현하지 않을경우, extension의 구현이 default로 사용된다.
+// - 만약 protocol을 채택한 곳에서 메서드를 구현했다면, extension 구현내용 상관없이 지역적으로 구현한 기능 대로 동작한다.
+// MARK: 50. Excample 3 - Multiple Extensions (BankAccount)
   
 import UIKit
 
@@ -12,6 +15,24 @@ protocol Account {
   func transfer(from: Account, to: Account, amount: Double)
   /// 이자 계산
   func calculateInterestEarned() -> Double
+}
+
+struct VerificationRequest {
+  let account: [Account]
+}
+
+struct VerificationResponse {
+  let verified: Bool
+}
+
+protocol Verification {
+  func performVerification(_ request: VerificationRequest, completion: (VerificationResponse) -> Void)
+}
+
+extension Verification {
+  func performVerification(_ request: VerificationRequest, completion: (VerificationResponse) -> Void) {
+    // perform the verificatio n
+  }
 }
 
 // protocol의 extension에 implementation을 하게 되면,
@@ -31,12 +52,17 @@ extension Account {
   }
 }
 
-struct CheckingAccount: Account {
+struct CheckingAccount: Account, Verification {
   
   var balance: Double
 
   func transfer(from: Account, to: Account, amount: Double) {
-    
+    // CheckingAccount가 채택 중인 Verification에 대한 메서드 구현이 별도로 없지만, extension Verification 블럭에서 default 메서드 구현이 되어있으므로, default 메서드를 사용할 수 있다.
+    performVerification(VerificationRequest(account: [from, to])) { response in
+      if response.verified {
+        // transfer funds
+      }
+    }
   }
 }
 
