@@ -17,13 +17,13 @@ protocol Parser {
   // associatedType은 protocol에 살아있는 제네릭입니다. 규약 타입을 필요에 따라 다양한 타입으로 정의하여 프로토콜을 채택 사용이 가능합니다.
   associatedtype Input
   associatedtype Output
-  
+  // Parser를 채택해서 사용하기 위해 반드시 준수해야하는 parse 메서드. parse 메서드에 사용되는 인자, 반환 타입은 associatedtype을 어떻게 정의해서 사용하느냐에 달려있다.
   func parse(input: Input) -> Output
 }
 
 // 프로토콜도 extension을 사용할 수 있습니다.
 extension Parser {
-
+  // Parser의 parse 메서드를 구현하지 않을 경우 default로 사용 가능한 메서드. typealias 정의는 하지 않았지만 메서드 구현부의 타입으로 타입추론이 가능
   func parse(input: String) -> [String] {
     return ["<html></html>", "<p></p>"]
   }
@@ -31,11 +31,12 @@ extension Parser {
 
 // XHTML 클래스와 같이 mandatory method 구현을 깜빡하고, parse 구현을 잊었을때 위 처럼 extension이 구현되어있다면 extension의 구현내용이 default로 적용되어 컴파일이 가능합니다.
 class XHTMLParser: Parser {
-  
+  // mandatory method 구현은 못했지만, extension Parser에 정의된 구현이 있어서 이걸 사용하게 됨.
 }
 
 class OHTMLParser: Parser {
   // Parser를 채택한 클래스 내부에 필수 메서드를 정의했다면 extension 구현 함수와 함께 사용 가능
+  // (input: Int) -> [Int] + default : (input: String) -> [String] 모두 사용 가능
   func parse(input: Int) -> [Int] {
     return [0]
   }
